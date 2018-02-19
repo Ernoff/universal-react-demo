@@ -13,8 +13,7 @@ Sample ServerSide rendered demo using Redux and ReactJS for the frontend, Nodejs
 
 
 ## View Demo Live
-- Navigate to `https://universal-react-redux.herokuapp.com/implicit/callback`
-on your browser to view demo live
+- Click on [Heroku Live Link](https://universal-react-redux.herokuapp.com/) to view demo live
 
 ## TODOs
 
@@ -23,4 +22,4 @@ on your browser to view demo live
 3.  Add javascript animation during background processes like login, registration and logout
 
 ## Contributor
-. [Ernest Offiong](http://github.com/ernoff)
+[Ernest Offiong](http://github.com/ernoff)
