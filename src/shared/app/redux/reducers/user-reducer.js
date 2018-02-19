@@ -1,8 +1,12 @@
 import { Types } from '../constants/user-types';
 
 const initialState = {
-    name: null,
-    email: null,
+  firstName: null,
+  lastName: null,
+  login: null,
+  sessionToken: null,
+  expiresAt: null,
+  email: null
 };
 export default function userReducer(state = initialState, action) {
     switch (action.type) {

@@ -8,7 +8,8 @@ module.exports = {
     entry: './src/server/server.js',
     output: {
         path: distPath,
-        filename: 'server.js'
+        filename: 'server.js',
+        publicPath: '/'
     },
     target: 'node',
     node: {
@@ -27,6 +28,9 @@ module.exports = {
             }
             //loaders for other file types can go here
         ]
+    },
+     devServer: {
+        historyApiFallback: true
     },
     externals: nodeExternals(),
     devtool: 'source-map'

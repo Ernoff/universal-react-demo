@@ -1,13 +1,15 @@
-# Isomorphic/Universal React App using NodeJS, React Router V4 and Redux
-Sample isomorphic demo using Redux, NodeJS, React Router V4, and ReactJS.
+# Universal React App using NodeJS, Okta and Redux
+Sample ServerSide rendered demo using Redux and ReactJS for the frontend, Nodejs on the server and Okta for authentication.
 
 ## Install
 
 1. Clone repository:
-`git clone https://github.com/supercycle91/isomorphic-demo.git`
+`git clone https://github.com/ernoff/universal-react-demo.git`
 2. Install dependencies: 
 `npm install`
 3. Start application:
 `npm start`
+4. Navigate to `http://localhost:9000` on your prefered browser to view dev
 
-See full tutorial [here](https://codeburst.io/react-isomorphic-universal-app-w-nodejs-redux-react-router-v4-be80aa57dcaf)
+## Contributor
+. [Ernest Offiong](http://github.com/ernoff)
