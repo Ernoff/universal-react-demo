@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import RedirectWithStatus from "./redirect-w-status.jsx";
 import {withAuth} from '@okta/okta-react';
-import LoginForm from './loginform.jsx'
+import LoginForm from './loginform.jsx';
 
 class ImplicitCallback extends Component {
   constructor(props) {

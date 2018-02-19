@@ -16,7 +16,6 @@ function loginUserFromOKTA(username, password, url) {
  return oktaAuth.signIn({username, password})
   .then(res => {
     console.log(res.data)
-    console.log(username, password, url)
      profile = res.data;
      return profile
   }).catch(err => console.error(err))

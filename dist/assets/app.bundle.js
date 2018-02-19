@@ -1441,7 +1441,6 @@ function loginUserFromOKTA(username, password, url) {
   var oktaAuth = new _oktaAuthJs2.default({ url: url });
   return oktaAuth.signIn({ username: username, password: password }).then(function (res) {
     console.log(res.data);
-    console.log(username, password, url);
     profile = res.data;
     return profile;
   }).catch(function (err) {

@@ -22,13 +22,14 @@ class App extends Component {
             <RedirectWithStatus key={Math.random() + 'REDIRECT_'} from={from} to={to} status={status} />
         );
         return <div>
-            <Navbar />
-            <Switch>
+        <Navbar />
+        
+        <Switch>
             {proutes}
             {routes}
             {redirects}
-              
-            </Switch>
+            </Switch>  
+            
           </div>;
     }
 

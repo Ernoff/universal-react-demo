@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/";
+/******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 23);
@@ -111,7 +111,7 @@ exports.register = register;
 
 var _loginTypes = __webpack_require__(12);
 
-var _isomorphicUnfetch = __webpack_require__(37);
+var _isomorphicUnfetch = __webpack_require__(36);
 
 var _isomorphicUnfetch2 = _interopRequireDefault(_isomorphicUnfetch);
 
@@ -133,7 +133,6 @@ function loginUserFromOKTA(username, password, url) {
   var oktaAuth = new _oktaAuthJs2.default({ url: url });
   return oktaAuth.signIn({ username: username, password: password }).then(function (res) {
     console.log(res.data);
-    console.log(username, password, url);
     profile = res.data;
     return profile;
   }).catch(function (err) {
@@ -715,22 +714,6 @@ exports.default = App;
 "use strict";
 
 
-var okta = __webpack_require__(35);
-
-var client = new okta.Client({
-  orgUrl: "https://dev-282338.oktapreview.com",
-  token: "00JaLCsZYkhuKlcu5r46jPBOWryjghESzSZ5j7IxEK"
-});
-
-module.exports = client;
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
@@ -748,7 +731,7 @@ var isFunction = function isFunction(action) {
 exports.default = customMiddleware;
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -778,16 +761,22 @@ var reducers = (0, _redux.combineReducers)({
 exports.default = reducers;
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = require("body-parser");
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = require("express");
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports) {
+
+module.exports = require("path");
 
 /***/ }),
 /* 20 */
@@ -814,13 +803,17 @@ module.exports = require("react-router");
 "use strict";
 
 
-var _express = __webpack_require__(19);
+var _express = __webpack_require__(18);
 
 var _express2 = _interopRequireDefault(_express);
 
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
+
+var _path2 = __webpack_require__(19);
+
+var _path3 = _interopRequireDefault(_path2);
 
 var _server = __webpack_require__(21);
 
@@ -840,13 +833,13 @@ var _reactRedux = __webpack_require__(3);
 
 var _redux = __webpack_require__(1);
 
-var _combine = __webpack_require__(17);
+var _combine = __webpack_require__(16);
 
 var _combine2 = _interopRequireDefault(_combine);
 
 var _reactRouter = __webpack_require__(22);
 
-var _thunk = __webpack_require__(16);
+var _thunk = __webpack_require__(15);
 
 var _thunk2 = _interopRequireDefault(_thunk);
 
@@ -854,7 +847,7 @@ var _routes = __webpack_require__(10);
 
 var _routes2 = _interopRequireDefault(_routes);
 
-var _bodyParser = __webpack_require__(18);
+var _bodyParser = __webpack_require__(17);
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
@@ -862,16 +855,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var app = (0, _express2.default)();
 
-var client = __webpack_require__(15);
 
-
-app.use('/dist', _express2.default.static('./dist'));
+app.use('/dist', _express2.default.static('dist'));
+// app.use(express.static(path.join(__dirname, 'dist')));
 app.use(_bodyParser2.default.json());
 
 app.post('/regis', function (req, res, next) {
-	// if(!req.body) return res.sendStatus(400);
-	// console.log('req.body');
-	// console.log(req.body)
+	if (!req.body) return res.sendStatus(400);
+
 	var newUser = { profile: {
 			firstName: req.body.firstName,
 			lastName: req.body.lastName,
@@ -910,7 +901,7 @@ app.get('*', async function (req, res) {
 			});
 			return foundPath;
 		}) || {},
-		    path = _ref.path,
+		    _path = _ref.path,
 		    component = _ref.component;
 		// safety check for valid component, if no component we initialize an empty shell.
 
@@ -958,7 +949,7 @@ app.listen(port, function () {
 });
 
 function renderFullPage(html, preloadedState, helmet) {
-	return '\n    <!doctype html>\n    <html>\n\t\t\t<head>\n  \t\t\t<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">\t\t\t\n        <link rel="icon" href="/dist/favicon.ico" type="image/ico" />\n        ' + helmet.title.toString() + '\n        ' + helmet.meta.toString() + '\n        ' + helmet.link.toString() + '\n      </head>\n      <body>\n        <div id="root">' + html + '</div>\n        <script>\n          // WARNING: See the following for security issues around embedding JSON in HTML:\n          // http://redux.js.org/docs/recipes/ServerRendering.html#security-considerations\n          window.__PRELOADED_STATE__ = ' + JSON.stringify(preloadedState).replace(/</g, '\\u003c') + '\n        </script>\n        <script src="/dist/assets/app.bundle.js"></script>\n      </body>\n    </html>\n    ';
+	return '\n    <!doctype html>\n    <html>\n\t\t\t<head>\n\t\t\t<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous" />\n\t\t\t' + helmet.title.toString() + '\n\t\t\t' + helmet.meta.toString() + '\n\t\t\t' + helmet.link.toString() + '\n\t\t\t<script type="text/javascript">\n\t\t\t\twindow.__PRELOADED_STATE__ = ' + JSON.stringify(preloadedState).replace(/</g, '\\u003c') + ';\n\t\t\t</script>\n      </head>\n      <body>\n        <div id="root">' + html + '</div>\n        <script src="/dist/assets/app.bundle.js"></script>\n\t\t\t\t</body>\n    </html>\n    ';
 }
 
 /***/ }),
@@ -1496,7 +1487,7 @@ exports.getName = getName;
 
 var _userTypes = __webpack_require__(13);
 
-var _axios = __webpack_require__(36);
+var _axios = __webpack_require__(35);
 
 var _axios2 = _interopRequireDefault(_axios);
 
@@ -2133,16 +2124,10 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(
 /* 35 */
 /***/ (function(module, exports) {
 
-module.exports = require("@okta/okta-sdk-nodejs");
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports) {
-
 module.exports = require("axios");
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports) {
 
 module.exports = require("isomorphic-unfetch");

@@ -33,6 +33,4 @@ hydrate(
         <App />
       </Security>
     </Router>
-  </Provider>,
-  document.getElementById("root")
-);
+  </Provider>, document.getElementById("root"));

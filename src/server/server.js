@@ -1,5 +1,6 @@
 import express from 'express';
 import React from 'react';
+import path from 'path';
 import ReactDOM from 'react-dom/server';
 import helmet from 'react-helmet';
 import App from '../shared/app/app.jsx';
@@ -11,16 +12,15 @@ import reducers from '../shared/app/redux/reducers/combine';
 import { StaticRouter as Router, matchPath } from 'react-router';
 import thunk from '../shared/app/redux/middleware/thunk';
 import routeBank from '../shared/routes/routes';
-const client = require('../shared/app/redux/middleware/okta'); 
-import bodyParser from 'body-parser'
+import bodyParser from 'body-parser';
 
-app.use('/dist', express.static('./dist'));
+app.use('/dist', express.static('dist'));
+// app.use(express.static(path.join(__dirname, 'dist')));
 app.use(bodyParser.json());
 
 app.post('/regis', (req, res, next) => {
-	// if(!req.body) return res.sendStatus(400);
-	// console.log('req.body');
-	// console.log(req.body)
+	if(!req.body) return res.sendStatus(400);
+
 	const newUser =
    { profile: { 
       firstName: req.body.firstName,
@@ -107,21 +107,18 @@ function renderFullPage(html, preloadedState, helmet) {
     <!doctype html>
     <html>
 			<head>
-  			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">			
-        <link rel="icon" href="/dist/favicon.ico" type="image/ico" />
-        ${helmet.title.toString()}
-        ${helmet.meta.toString()}
-        ${helmet.link.toString()}
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous" />
+			${helmet.title.toString()}
+			${helmet.meta.toString()}
+			${helmet.link.toString()}
+			<script type="text/javascript">
+				window.__PRELOADED_STATE__ = ${JSON.stringify(preloadedState).replace(/</g, "\\u003c")};
+			</script>
       </head>
       <body>
         <div id="root">${html}</div>
-        <script>
-          // WARNING: See the following for security issues around embedding JSON in HTML:
-          // http://redux.js.org/docs/recipes/ServerRendering.html#security-considerations
-          window.__PRELOADED_STATE__ = ${JSON.stringify(preloadedState).replace(/</g, "\\u003c")}
-        </script>
         <script src="/dist/assets/app.bundle.js"></script>
-      </body>
+				</body>
     </html>
     `;
 }
