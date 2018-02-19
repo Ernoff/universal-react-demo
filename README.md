@@ -11,5 +11,16 @@ Sample ServerSide rendered demo using Redux and ReactJS for the frontend, Nodejs
 `npm start`
 4. Navigate to `http://localhost:9000` on your prefered browser to view dev
 
+
+## View Demo Live
+- Navigate to `https://universal-react-redux.herokuapp.com/implicit/callback`
+on your browser to view demo live
+
+## TODOs
+
+1.  Implement Recover password via Okta service
+2.  Reroute to secure routes after registration
+3.  Add javascript animation during background processes like login, registration and logout
+
 ## Contributor
 . [Ernest Offiong](http://github.com/ernoff)
