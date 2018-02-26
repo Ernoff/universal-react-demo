@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
+import { withAuth } from "@okta/okta-react";
 
 class Home extends Component {
     render() {
@@ -19,4 +20,4 @@ class Home extends Component {
         );
     }
 }
-export default Home;
+export default withAuth(Home);

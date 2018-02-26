@@ -36,22 +36,28 @@ class ResetPass extends React.Component {
   }
 
   render() {
-    if (this.state.sessionToken) {
-      this.props.auth.redirect({ sessionToken: this.state.sessionToken });
-      return null;
-    }
+    // if (this.state.sessionToken) {
+    //   this.props.auth.redirect({ sessionToken: this.state.sessionToken });
+    //   return null;
+    // }
 
-    return <form onSubmit={this.handleSubmit}>
-        <div className="form-element">
-          <label>Password:</label>
-          <input type="password" id="password" value={this.state.password} onChange={this.handlePasswordChange} />
-        </div>
-        <div className="form-element">
-          <label>Confirm Password:</label>
-          <input type="password" id="password" value={this.state.confirm} onChange={this.handleConfirmChange} />
-        </div>
-        <input type="submit" id="submit" value="Register" />
-      </form>;
+    return(
+       <div className="container">
+      <div className="row">
+        <div className="col align-self-center">
+            <form onSubmit={this.handleSubmit}>
+                <div className="form-element">
+                  <label>Password:</label>
+                  <input type="password" id="password" value={this.state.password} onChange={this.handlePasswordChange} />
+                </div>
+                <div className="form-element">
+                  <label>Confirm Password:</label>
+                  <input type="password" id="password" value={this.state.confirm} onChange={this.handleConfirmChange} />
+                </div>
+                <input type="submit" id="submit" value="ResetPass" />
+              </form>
+      </div></div></div>
+    );
   }
 }
 

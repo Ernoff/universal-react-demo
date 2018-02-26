@@ -13,6 +13,9 @@ import { StaticRouter as Router, matchPath } from 'react-router';
 import thunk from '../shared/app/redux/middleware/thunk';
 import routeBank from '../shared/routes/routes';
 import bodyParser from 'body-parser';
+import request from 'superagent';
+import client from '../shared/app/redux/middleware/okta';
+import fetch from 'isomorphic-unfetch';
 
 app.use('/dist', express.static('dist'));
 // app.use(express.static(path.join(__dirname, 'dist')));
@@ -20,29 +23,62 @@ app.use(bodyParser.json());
 
 app.post('/regis', (req, res, next) => {
 	if(!req.body) return res.sendStatus(400);
-
-	const newUser =
-   { profile: { 
+	const body = {
+    profile: {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
-      login: req.body.email 
+      login: req.body.login
     },
-  credentials:{
-    password:{
-			value: req.body.password
-		}
-	}};
-return client.createUser(newUser)
-	.then(user => {
-		res.status(201);
-		 res.json(user);
-		// console.log(user)
-	})
-	.catch(err => {
-		res.status(400);
-		res.send(err)
-	})
+    credentials:{
+      password: {value: req.body.password },
+      recovery_question: {
+        question: req.body.question,
+        answer: req.body.answer
+      }
+    }
+  };
+	return request
+    .post(req.body.url)
+    .send(body)
+    .set("Accept", "application/json")
+    .set("Content-Type", "application/json")
+    .set("Authorization", req.body.auth)
+    .then((resp) => {
+        //  console.log(resp);
+				// console.log(JSON.stringify(resp.body));
+				res.status(201);
+        res.send(resp.body);
+		})
+		.catch((err) => {
+			res.status(err.status);
+			res.send(err.error)
+			// console.log(err.status)
+			// console.log(err.text)
+		});
+// 	const newUser =
+//    { profile: { 
+//       firstName: req.body.firstName,
+//       lastName: req.body.lastName,
+//       email: req.body.email,
+//       login: req.body.email 
+//     },
+//   credentials:{
+//     password:{
+// 			value: req.body.password
+// 		}
+// 	}};
+	
+// return client.createUser(newUser)
+// 	.then(user => {
+// 		res.status(201);
+// 		 res.json(user);
+// 		// console.log(user)
+// 	})
+// 	.catch(err => {
+// 		res.status(400);
+// 		res.send(err)
+// 	})
 });
 app.get('*', async (req, res) => {
 	try {

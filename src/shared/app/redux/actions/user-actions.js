@@ -1,4 +1,4 @@
-import { Types } from '../constants/user-types';
+import { Types } from '../constants';
 import Request from 'axios';
 
 export function getName(user) {

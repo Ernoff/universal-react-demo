@@ -19,16 +19,15 @@ class Login extends Component {
   }
 
   async checkAuthentication() {
-
-try {
-  const authenticated = await this.props.auth.isAuthenticated();
-  if (authenticated !== this.state.authenticated) {
-    this.setState({ authenticated });
+    try {
+      const authenticated = await this.props.auth.isAuthenticated();
+      if (authenticated !== this.state.authenticated) {
+        this.setState({ authenticated });
+        }
+    } catch (e) {
+      console.log(e)
+      }
     }
-} catch (e) {
-  console.log(e)
-  }
-}
 
   componentDidUpdate() {
     this.checkAuthentication();

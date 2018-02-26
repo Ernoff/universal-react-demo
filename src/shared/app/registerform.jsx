@@ -3,6 +3,7 @@ import OktaAuth from '@okta/okta-auth-js';
 import { withAuth } from '@okta/okta-react';
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
+import RedirectWithStatus from "./redirect-w-status.jsx";
 import * as actions from "./redux/actions/login-action";
 import { Link } from "react-router-dom";
 
@@ -17,12 +18,16 @@ class RegisterForm extends React.Component {
       lastName: "",
       email: "",
       password: "",
+      question: "",
+      answer: "",
       sessionToken: null
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleFirstNameChange = this.handleFirstNameChange.bind(this);
     this.handleLastNameChange = this.handleLastNameChange.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
+    this.handleQuestionChange = this.handleQuestionChange.bind(this);
+    this.handleAnswerChange = this.handleAnswerChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
   }
 
@@ -32,6 +37,15 @@ class RegisterForm extends React.Component {
   handleLastNameChange(e) {
     this.setState({ lastName: e.target.value });
   }
+  handleQuestionChange(e) {
+    this.setState({ question: e.target.value });
+    // console.log(e.target.value)
+  }
+  handleAnswerChange(e) {
+    this.setState({ answer: e.target.value });
+    // console.log(e.target.value);
+       
+  }
   handleEmailChange(e) {
     this.setState({ email: e.target.value });
   }
@@ -39,13 +53,15 @@ class RegisterForm extends React.Component {
     this.setState({ password: e.target.value });
   }
 
-  handleSubmit(e) {
+  async handleSubmit(e) {
     e.preventDefault();
-    const { firstName, lastName, email, password } = this.state;
+    const { firstName, lastName, email, password, question, answer } = this.state;
     let url = this.props.auth._config.baseUrl;
     if (email && password) {
-      this.props.register(firstName, lastName, email, password, url);
-    }
+     await this.props.register(firstName, lastName, email, password, url, question, answer);
+    // return <RedirectWithStatus key={Math.random() + "REDIRECT_"} from={"/regis"} to={"/login"} status={301} />;
+      alert('registration successful')
+  }
   }
 
   render() {
@@ -111,6 +127,26 @@ class RegisterForm extends React.Component {
                   number. It should be up to 6 characters
                 </small>
               </div>
+              <div className="form-group">
+                <label htmlFor="question">Security Question:</label>
+                <input
+                  className="form-control"
+                  type="text"
+                  id="question"
+                  value={this.state.question}
+                  onChange={this.handleQuestionChange}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="answer">Security Answer:</label>
+                <input
+                  className="form-control"
+                  type="text"
+                  id="answer"
+                  value={this.state.answer}
+                  onChange={this.handleAnswerChange}
+                />
+              </div>
               <input
                 type="submit"
                 id="submit"
@@ -118,10 +154,17 @@ class RegisterForm extends React.Component {
                 className="btn btn-primary"
               />
             </form>
-            <hr/>
-            <hr/>
+            <hr />
+            <hr />
             <p>If you have an account, click here to login</p>
-            <Link to="/login"><button type="button" className="btn btn-secondary btn-lg btn-block">Login</button></Link>
+            <Link to="/login">
+              <button
+                type="button"
+                className="btn btn-secondary btn-lg btn-block"
+              >
+                Login
+              </button>
+            </Link>
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@ import LoginForm from './loginform.jsx';
 class ImplicitCallback extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
+    // console.log(props);
 
     this.state = {
       authenticated: null,
@@ -27,13 +27,13 @@ class ImplicitCallback extends Component {
          }
        }
        this.props.auth._history.push('/')
-       console.log(this.props);
+      //  console.log(this.props);
      } catch (e) {
        this.props.auth._history.push("/login");
      }
   }
   render() {
-    console.log(this.props);
+    // console.log(this.props);
     if (this.state.authenticated === null) {
       return null;
     }

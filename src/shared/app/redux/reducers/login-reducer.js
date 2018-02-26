@@ -1,4 +1,4 @@
-import { Types } from '../constants/login-types';
+import { Types } from '../constants';
 
 const initialState = {
   firstName: null,

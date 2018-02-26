@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 23);
+/******/ 	return __webpack_require__(__webpack_require__.s = 25);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -76,13 +76,13 @@ module.exports = require("react");
 /* 1 */
 /***/ (function(module, exports) {
 
-module.exports = require("redux");
+module.exports = require("@okta/okta-react");
 
 /***/ }),
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = require("@okta/okta-react");
+module.exports = require("redux");
 
 /***/ }),
 /* 3 */
@@ -98,6 +98,12 @@ module.exports = require("react-router-dom");
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports) {
+
+module.exports = require("@okta/okta-auth-js");
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -109,13 +115,13 @@ Object.defineProperty(exports, "__esModule", {
 exports.login = login;
 exports.register = register;
 
-var _loginTypes = __webpack_require__(12);
+var _constants = __webpack_require__(7);
 
-var _isomorphicUnfetch = __webpack_require__(36);
+var _isomorphicUnfetch = __webpack_require__(10);
 
 var _isomorphicUnfetch2 = _interopRequireDefault(_isomorphicUnfetch);
 
-var _oktaAuthJs = __webpack_require__(6);
+var _oktaAuthJs = __webpack_require__(5);
 
 var _oktaAuthJs2 = _interopRequireDefault(_oktaAuthJs);
 
@@ -124,15 +130,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function login(username, password, url) {
   return async function (dispatch, getState) {
     var profile = await loginUserFromOKTA(username, password, url);
-    console.log(profile);
-    dispatch({ type: _loginTypes.Types.LOGIN_SUCCESS, profile: profile });
+    // console.log(profile)
+    dispatch({ type: _constants.Types.LOGIN_SUCCESS, profile: profile });
   };
 }
 function loginUserFromOKTA(username, password, url) {
   var profile = void 0;
   var oktaAuth = new _oktaAuthJs2.default({ url: url });
   return oktaAuth.signIn({ username: username, password: password }).then(function (res) {
-    console.log(res.data);
+    // console.log(res.data)
     profile = res.data;
     return profile;
   }).catch(function (err) {
@@ -140,17 +146,33 @@ function loginUserFromOKTA(username, password, url) {
   });
 }
 
-function register(firstName, lastName, password, email, url) {
+function register(firstName, lastName, password, email, url, question, answer) {
   return async function (dispatch, getState) {
-    var profile = await registerUserFromOKTA(firstName, lastName, password, email, url);
-    dispatch({ type: _loginTypes.Types.LOGIN_SUCCESS, profile: profile });
+    var profile = await registerUserFromOKTA(firstName, lastName, password, email, url, question, answer);
+    //  console.log(profile);
+    //  console.log("profile");
+    // dispatch({ type: Types.LOGIN_SUCCESS, profile });
   };
 }
-
-function registerUserFromOKTA(firstName, lastName, email, password, url) {
-  var body = { firstName: firstName, lastName: lastName, email: email, login: email, password: password };
-  console.log(body);
-
+async function registerUserFromOKTA(firstName, lastName, email, password, url, question, answer) {
+  var body = { firstName: firstName, lastName: lastName, email: email, login: email, question: question, answer: answer,
+    password: password, url: "" + url + _constants.Types.REGISTRATION, auth: "SSWS " + _constants.Types.api_token };
+  // const body = {
+  //   "profile": {
+  //     "firstName": firstName,
+  //     "lastName": lastName,
+  //     "email": email,
+  //     "login": email
+  //   },
+  //   "credentials":{
+  //     "password": {"value": password },
+  //     "recovery_question": {
+  //       "question": question,
+  //       "answer": answer
+  //     }
+  //   }
+  // }
+  // console.log(body);
   var request = new Request("/regis", {
     method: "POST",
     body: JSON.stringify(body),
@@ -159,23 +181,43 @@ function registerUserFromOKTA(firstName, lastName, email, password, url) {
       Accept: "application/json"
     })
   });
-  (0, _isomorphicUnfetch2.default)(request).then(function (res) {
-    if (res.status === 201) {
-      return loginUserFromOKTA(email, password, url);
-    }
+  //  console.log(this.props.history)
+  await (0, _isomorphicUnfetch2.default)(request).then(function (res) {
+    //  if (res.status === 200) {
+    //    return loginUserFromOKTA(email, password, url);
+    //  }
+    // console.log('client')
+    console.log(res);
   }).catch(function (err) {
     return console.log(err);
   });
 }
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports) {
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = require("@okta/okta-auth-js");
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var Types = exports.Types = {
+  LOGIN_SUCCESS: "LOGIN_SUCCESS",
+  REGISTER_SUCCESS: "REGISTER_SUCCESS",
+  LOGIN_ERROR: "LOGIN_ERROR",
+  REGISTER_ERROR: "REGISTER_ERROR",
+  UPDATE_NAME: 'UPDATE_NAME',
+  REGISTRATION: '/api/v1/users',
+  RECOVERY_URL: '/api/v1/authn/recovery/password',
+  VERIFY_URL: '/api/v1/authn/recovery/token',
+  RESET_URL: '/api/v1/authn/credentials/reset_password',
+  api_token: '00JaLCsZYkhuKlcu5r46jPBOWryjghESzSZ5j7IxEK'
+};
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -193,17 +235,17 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _oktaAuthJs = __webpack_require__(6);
+var _oktaAuthJs = __webpack_require__(5);
 
 var _oktaAuthJs2 = _interopRequireDefault(_oktaAuthJs);
 
-var _oktaReact = __webpack_require__(2);
+var _oktaReact = __webpack_require__(1);
 
-var _redux = __webpack_require__(1);
+var _redux = __webpack_require__(2);
 
 var _reactRedux = __webpack_require__(3);
 
-var _loginAction = __webpack_require__(5);
+var _loginAction = __webpack_require__(6);
 
 var actions = _interopRequireWildcard(_loginAction);
 
@@ -375,12 +417,6 @@ function mapDispatchToProps(dispatch) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _oktaReact.withAuth)(LoginForm));
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
-module.exports = require("react-helmet");
-
-/***/ }),
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -417,6 +453,18 @@ exports.default = RedirectWithStatus;
 
 /***/ }),
 /* 10 */
+/***/ (function(module, exports) {
+
+module.exports = require("isomorphic-unfetch");
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+module.exports = require("react-helmet");
+
+/***/ }),
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -426,39 +474,39 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _navbar = __webpack_require__(11);
+var _navbar = __webpack_require__(13);
 
 var _navbar2 = _interopRequireDefault(_navbar);
 
-var _home = __webpack_require__(26);
+var _home = __webpack_require__(28);
 
 var _home2 = _interopRequireDefault(_home);
 
-var _homepad = __webpack_require__(27);
+var _homepad = __webpack_require__(29);
 
 var _homepad2 = _interopRequireDefault(_homepad);
 
-var _loginform = __webpack_require__(7);
+var _loginform = __webpack_require__(8);
 
 var _loginform2 = _interopRequireDefault(_loginform);
 
-var _forgetpass = __webpack_require__(25);
+var _forgetpass = __webpack_require__(27);
 
 var _forgetpass2 = _interopRequireDefault(_forgetpass);
 
-var _resetpass = __webpack_require__(33);
+var _resetpass = __webpack_require__(36);
 
 var _resetpass2 = _interopRequireDefault(_resetpass);
 
-var _login = __webpack_require__(28);
+var _login = __webpack_require__(30);
 
 var _login2 = _interopRequireDefault(_login);
 
-var _registerform = __webpack_require__(32);
+var _registerform = __webpack_require__(35);
 
 var _registerform2 = _interopRequireDefault(_registerform);
 
-var _user = __webpack_require__(34);
+var _user = __webpack_require__(37);
 
 var _user2 = _interopRequireDefault(_user);
 
@@ -504,7 +552,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -521,6 +569,8 @@ var _react = __webpack_require__(0);
 var _react2 = _interopRequireDefault(_react);
 
 var _reactRouterDom = __webpack_require__(4);
+
+var _oktaReact = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -570,38 +620,7 @@ var Home = function (_Component) {
     return Home;
 }(_react.Component);
 
-exports.default = Home;
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var Types = exports.Types = {
-  LOGIN_SUCCESS: "LOGIN_SUCCESS",
-  REGISTER_SUCCESS: "REGISTER_SUCCESS",
-  LOGIN_ERROR: "LOGIN_ERROR",
-  REGISTER_ERROR: "REGISTER_ERROR"
-};
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-var Types = exports.Types = {
-    UPDATE_NAME: 'UPDATE_NAME'
-};
+exports.default = (0, _oktaReact.withAuth)(Home);
 
 /***/ }),
 /* 14 */
@@ -626,25 +645,25 @@ var _redirectWStatus = __webpack_require__(9);
 
 var _redirectWStatus2 = _interopRequireDefault(_redirectWStatus);
 
-var _navbar = __webpack_require__(11);
+var _navbar = __webpack_require__(13);
 
 var _navbar2 = _interopRequireDefault(_navbar);
 
-var _routes = __webpack_require__(10);
+var _routes = __webpack_require__(12);
 
 var _routes2 = _interopRequireDefault(_routes);
 
-var _loginform = __webpack_require__(7);
+var _loginform = __webpack_require__(8);
 
 var _loginform2 = _interopRequireDefault(_loginform);
 
-var _ = __webpack_require__(24);
+var _ = __webpack_require__(26);
 
 var _2 = _interopRequireDefault(_);
 
-var _oktaReact = __webpack_require__(2);
+var _oktaReact = __webpack_require__(1);
 
-var _loginAction = __webpack_require__(5);
+var _loginAction = __webpack_require__(6);
 
 var _loginAction2 = _interopRequireDefault(_loginAction);
 
@@ -714,6 +733,22 @@ exports.default = App;
 "use strict";
 
 
+var okta = __webpack_require__(38);
+
+var client = new okta.Client({
+  orgUrl: "https://dev-282338.oktapreview.com",
+  token: "00JaLCsZYkhuKlcu5r46jPBOWryjghESzSZ5j7IxEK"
+});
+
+module.exports = client;
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
@@ -731,7 +766,7 @@ var isFunction = function isFunction(action) {
 exports.default = customMiddleware;
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -741,13 +776,13 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _redux = __webpack_require__(1);
+var _redux = __webpack_require__(2);
 
-var _userReducer = __webpack_require__(31);
+var _userReducer = __webpack_require__(34);
 
 var _userReducer2 = _interopRequireDefault(_userReducer);
 
-var _loginReducer = __webpack_require__(30);
+var _loginReducer = __webpack_require__(33);
 
 var _loginReducer2 = _interopRequireDefault(_loginReducer);
 
@@ -761,49 +796,55 @@ var reducers = (0, _redux.combineReducers)({
 exports.default = reducers;
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = require("body-parser");
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = require("express");
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 module.exports = require("path");
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-dom");
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-dom/server");
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-router");
 
 /***/ }),
-/* 23 */
+/* 24 */
+/***/ (function(module, exports) {
+
+module.exports = require("superagent");
+
+/***/ }),
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _express = __webpack_require__(18);
+var _express = __webpack_require__(19);
 
 var _express2 = _interopRequireDefault(_express);
 
@@ -811,15 +852,15 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _path2 = __webpack_require__(19);
+var _path2 = __webpack_require__(20);
 
 var _path3 = _interopRequireDefault(_path2);
 
-var _server = __webpack_require__(21);
+var _server = __webpack_require__(22);
 
 var _server2 = _interopRequireDefault(_server);
 
-var _reactHelmet = __webpack_require__(8);
+var _reactHelmet = __webpack_require__(11);
 
 var _reactHelmet2 = _interopRequireDefault(_reactHelmet);
 
@@ -827,29 +868,41 @@ var _app = __webpack_require__(14);
 
 var _app2 = _interopRequireDefault(_app);
 
-var _reactDom = __webpack_require__(20);
+var _reactDom = __webpack_require__(21);
 
 var _reactRedux = __webpack_require__(3);
 
-var _redux = __webpack_require__(1);
+var _redux = __webpack_require__(2);
 
-var _combine = __webpack_require__(16);
+var _combine = __webpack_require__(17);
 
 var _combine2 = _interopRequireDefault(_combine);
 
-var _reactRouter = __webpack_require__(22);
+var _reactRouter = __webpack_require__(23);
 
-var _thunk = __webpack_require__(15);
+var _thunk = __webpack_require__(16);
 
 var _thunk2 = _interopRequireDefault(_thunk);
 
-var _routes = __webpack_require__(10);
+var _routes = __webpack_require__(12);
 
 var _routes2 = _interopRequireDefault(_routes);
 
-var _bodyParser = __webpack_require__(17);
+var _bodyParser = __webpack_require__(18);
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
+
+var _superagent = __webpack_require__(24);
+
+var _superagent2 = _interopRequireDefault(_superagent);
+
+var _okta = __webpack_require__(15);
+
+var _okta2 = _interopRequireDefault(_okta);
+
+var _isomorphicUnfetch = __webpack_require__(10);
+
+var _isomorphicUnfetch2 = _interopRequireDefault(_isomorphicUnfetch);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -862,26 +915,55 @@ app.use(_bodyParser2.default.json());
 
 app.post('/regis', function (req, res, next) {
 	if (!req.body) return res.sendStatus(400);
-
-	var newUser = { profile: {
+	var body = {
+		profile: {
 			firstName: req.body.firstName,
 			lastName: req.body.lastName,
 			email: req.body.email,
-			login: req.body.email
+			login: req.body.login
 		},
 		credentials: {
-			password: {
-				value: req.body.password
+			password: { value: req.body.password },
+			recovery_question: {
+				question: req.body.question,
+				answer: req.body.answer
 			}
-		} };
-	return client.createUser(newUser).then(function (user) {
+		}
+	};
+	return _superagent2.default.post(req.body.url).send(body).set("Accept", "application/json").set("Content-Type", "application/json").set("Authorization", req.body.auth).then(function (resp) {
+		//  console.log(resp);
+		// console.log(JSON.stringify(resp.body));
 		res.status(201);
-		res.json(user);
-		// console.log(user)
+		res.send(resp.body);
 	}).catch(function (err) {
-		res.status(400);
-		res.send(err);
+		res.status(err.status);
+		res.send(err.error);
+		// console.log(err.status)
+		// console.log(err.text)
 	});
+	// 	const newUser =
+	//    { profile: { 
+	//       firstName: req.body.firstName,
+	//       lastName: req.body.lastName,
+	//       email: req.body.email,
+	//       login: req.body.email 
+	//     },
+	//   credentials:{
+	//     password:{
+	// 			value: req.body.password
+	// 		}
+	// 	}};
+
+	// return client.createUser(newUser)
+	// 	.then(user => {
+	// 		res.status(201);
+	// 		 res.json(user);
+	// 		// console.log(user)
+	// 	})
+	// 	.catch(err => {
+	// 		res.status(400);
+	// 		res.send(err)
+	// 	})
 });
 app.get('*', async function (req, res) {
 	try {
@@ -953,7 +1035,7 @@ function renderFullPage(html, preloadedState, helmet) {
 }
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1010,7 +1092,7 @@ var FourOFour = function (_Component) {
 exports.default = FourOFour;
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1028,19 +1110,19 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _oktaAuthJs = __webpack_require__(6);
+var _oktaAuthJs = __webpack_require__(5);
 
 var _oktaAuthJs2 = _interopRequireDefault(_oktaAuthJs);
 
-var _oktaReact = __webpack_require__(2);
+var _oktaReact = __webpack_require__(1);
 
-var _redux = __webpack_require__(1);
+var _redux = __webpack_require__(2);
 
 var _reactRedux = __webpack_require__(3);
 
-var _loginAction = __webpack_require__(5);
+var _forgotpassAction = __webpack_require__(31);
 
-var actions = _interopRequireWildcard(_loginAction);
+var actions = _interopRequireWildcard(_forgotpassAction);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -1061,18 +1143,26 @@ var ForgetPass = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (ForgetPass.__proto__ || Object.getPrototypeOf(ForgetPass)).call(this, props));
 
     _this.state = {
-      confirm: "",
+      email: "",
       password: "",
+      confirm: "",
+      error: null,
       sessionToken: null
     };
 
     _this.handleSubmit = _this.handleSubmit.bind(_this);
     _this.handleConfirmChange = _this.handleConfirmChange.bind(_this);
     _this.handlePasswordChange = _this.handlePasswordChange.bind(_this);
+    _this.handleEmailChange = _this.handleEmailChange.bind(_this);
     return _this;
   }
 
   _createClass(ForgetPass, [{
+    key: "handleEmailChange",
+    value: function handleEmailChange(e) {
+      this.setState({ email: e.target.value });
+    }
+  }, {
     key: "handleConfirmChange",
     value: function handleConfirmChange(e) {
       this.setState({ confirm: e.target.value });
@@ -1087,56 +1177,95 @@ var ForgetPass = function (_React$Component) {
     value: function handleSubmit(e) {
       e.preventDefault();
       var _state = this.state,
-          confirm = _state.confirm,
-          password = _state.password;
+          email = _state.email,
+          password = _state.password,
+          confirm = _state.confirm;
 
       var url = this.props.auth._config.baseUrl;
-      if (confirm === password) {
-        // this.props.register(firstName, lastName, email, password, url);
+      if (password === confirm) {
+        this.props.forgot(email, url, password);
+        console.log(true);
+      } else {
+        console.log('error: Password do not match');
       }
     }
   }, {
     key: "render",
     value: function render() {
-      if (this.state.sessionToken) {
-        this.props.auth.redirect({ sessionToken: this.state.sessionToken });
-        return null;
-      }
+      // if (this.state.sessionToken) {
+      //   this.props.auth.redirect({ sessionToken: this.state.sessionToken });
+      //   return null;
+      // }
 
       return _react2.default.createElement(
-        "form",
-        { onSubmit: this.handleSubmit },
+        "div",
+        { className: "container" },
         _react2.default.createElement(
           "div",
-          { className: "form-element" },
+          { className: "row" },
           _react2.default.createElement(
-            "label",
-            null,
-            "Password:"
-          ),
-          _react2.default.createElement("input", {
-            type: "password",
-            id: "password",
-            value: this.state.password,
-            onChange: this.handlePasswordChange
-          })
-        ),
-        _react2.default.createElement(
-          "div",
-          { className: "form-element" },
-          _react2.default.createElement(
-            "label",
-            null,
-            "Confirm Password:"
-          ),
-          _react2.default.createElement("input", {
-            type: "password",
-            id: "password",
-            value: this.state.confirm,
-            onChange: this.handleConfirmChange
-          })
-        ),
-        _react2.default.createElement("input", { type: "submit", id: "submit", value: "Register" })
+            "div",
+            { className: "col align-self-center" },
+            _react2.default.createElement(
+              "form",
+              { onSubmit: this.handleSubmit },
+              _react2.default.createElement(
+                "div",
+                { className: "form-group" },
+                _react2.default.createElement(
+                  "label",
+                  null,
+                  "Email:"
+                ),
+                _react2.default.createElement("input", {
+                  className: "form-control",
+                  type: "email",
+                  id: "email",
+                  value: this.state.email,
+                  onChange: this.handleEmailChange
+                })
+              ),
+              _react2.default.createElement(
+                "div",
+                { className: "form-group" },
+                _react2.default.createElement(
+                  "label",
+                  null,
+                  "Password:"
+                ),
+                _react2.default.createElement("input", {
+                  className: "form-control",
+                  type: "password",
+                  id: "password",
+                  value: this.state.password,
+                  onChange: this.handlePasswordChange
+                })
+              ),
+              _react2.default.createElement(
+                "div",
+                { className: "form-group" },
+                _react2.default.createElement(
+                  "label",
+                  null,
+                  "Confirm Password:"
+                ),
+                _react2.default.createElement("input", {
+                  className: "form-control",
+                  type: "password",
+                  id: "password",
+                  value: this.state.confirm,
+                  onChange: this.handleConfirmChange
+                })
+              ),
+              _react2.default.createElement("input", {
+                className: "btn btn-primary btn-lg btn-block",
+                type: "submit",
+                id: "submit",
+                value: "Forgot Password"
+              })
+            )
+          )
+        )
       );
     }
   }]);
@@ -1153,7 +1282,7 @@ function mapDispatchToProps(dispatch) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _oktaReact.withAuth)(ForgetPass));
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1169,9 +1298,11 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactHelmet = __webpack_require__(8);
+var _reactHelmet = __webpack_require__(11);
 
 var _reactRouterDom = __webpack_require__(4);
+
+var _oktaReact = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1234,10 +1365,10 @@ var Home = function (_Component) {
     return Home;
 }(_react.Component);
 
-exports.default = Home;
+exports.default = (0, _oktaReact.withAuth)(Home);
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1257,9 +1388,9 @@ var _redirectWStatus = __webpack_require__(9);
 
 var _redirectWStatus2 = _interopRequireDefault(_redirectWStatus);
 
-var _oktaReact = __webpack_require__(2);
+var _oktaReact = __webpack_require__(1);
 
-var _loginform = __webpack_require__(7);
+var _loginform = __webpack_require__(8);
 
 var _loginform2 = _interopRequireDefault(_loginform);
 
@@ -1277,9 +1408,9 @@ var ImplicitCallback = function (_Component) {
   function ImplicitCallback(props) {
     _classCallCheck(this, ImplicitCallback);
 
-    var _this = _possibleConstructorReturn(this, (ImplicitCallback.__proto__ || Object.getPrototypeOf(ImplicitCallback)).call(this, props));
+    // console.log(props);
 
-    console.log(props);
+    var _this = _possibleConstructorReturn(this, (ImplicitCallback.__proto__ || Object.getPrototypeOf(ImplicitCallback)).call(this, props));
 
     _this.state = {
       authenticated: null,
@@ -1325,7 +1456,7 @@ var ImplicitCallback = function (_Component) {
         }
 
         this.props.auth._history.push('/');
-        console.log(this.props);
+        //  console.log(this.props);
       } catch (e) {
         this.props.auth._history.push("/login");
       }
@@ -1333,7 +1464,7 @@ var ImplicitCallback = function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      console.log(this.props);
+      // console.log(this.props);
       if (this.state.authenticated === null) {
         return null;
       }
@@ -1358,7 +1489,7 @@ var ImplicitCallback = function (_Component) {
 exports.default = (0, _oktaReact.withAuth)(ImplicitCallback);
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1378,7 +1509,7 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRouterDom = __webpack_require__(4);
 
-var _loginform = __webpack_require__(7);
+var _loginform = __webpack_require__(8);
 
 var _loginform2 = _interopRequireDefault(_loginform);
 
@@ -1386,13 +1517,13 @@ var _redirectWStatus = __webpack_require__(9);
 
 var _redirectWStatus2 = _interopRequireDefault(_redirectWStatus);
 
-var _oktaReact = __webpack_require__(2);
+var _oktaReact = __webpack_require__(1);
 
-var _redux = __webpack_require__(1);
+var _redux = __webpack_require__(2);
 
 var _reactRedux = __webpack_require__(3);
 
-var _loginAction = __webpack_require__(5);
+var _loginAction = __webpack_require__(6);
 
 var actions = _interopRequireWildcard(_loginAction);
 
@@ -1432,7 +1563,6 @@ var Login = function (_Component) {
   _createClass(Login, [{
     key: "checkAuthentication",
     value: async function checkAuthentication() {
-
       try {
         var authenticated = await this.props.auth.isAuthenticated();
         if (authenticated !== this.state.authenticated) {
@@ -1474,7 +1604,120 @@ function mapDispatchToProps(dispatch) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _oktaReact.withAuth)(Login));
 
 /***/ }),
-/* 29 */
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.forgot = forgot;
+
+var _constants = __webpack_require__(7);
+
+var _isomorphicUnfetch = __webpack_require__(10);
+
+var _isomorphicUnfetch2 = _interopRequireDefault(_isomorphicUnfetch);
+
+var _oktaAuthJs = __webpack_require__(5);
+
+var _oktaAuthJs2 = _interopRequireDefault(_oktaAuthJs);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function forgot(email, url, password) {
+  return async function (dispatch, getState) {
+    var profile = forgotPasswordWithOKTA(email, url, password);
+    console.log(profile);
+    // dispatch({ type: Types.LOGIN_SUCCESS, profile });
+  };
+}
+
+function forgotPasswordWithOKTA(email, url, password) {
+  var body = {
+    username: email,
+    relayState: "/login"
+  };
+  console.log(body);
+
+  var request = new Request("" + url + _constants.Types.RECOVERY_URL, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "SSWS " + _constants.Types.api_token
+    })
+  });
+  (0, _isomorphicUnfetch2.default)(request).then(function (res) {
+    var recoveryToken = res.recoveryToken;
+    console.log(res);
+    if (res.status === "RECOVERY") {
+      return verifyToken(recoveryToken, url, password);
+    }
+  }).catch(function (err) {
+    return console.log(err);
+  });
+}
+
+function verifyToken(token, url, password) {
+
+  var body = {
+    recoveryToken: token
+  };
+  console.log(body);
+
+  var request = new Request("" + url + _constants.Types.VERIFY_URL, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "SSWS " + _constants.Types.api_token
+    })
+  });
+  (0, _isomorphicUnfetch2.default)(request).then(function (res) {
+    var stateToken = res.stateToken;
+    console.log(res);
+    if (res.status === "RECOVERY") {
+      return resetPassword(stateToken, url, password);
+    }
+  }).catch(function (err) {
+    return console.log(err);
+  });
+}
+
+function resetPassword(token, url, password) {
+  var body = {
+    stateToken: token,
+    newPassword: password
+  };
+  console.log(body);
+
+  var request = new Request("" + url + _constants.Types.RESET_URL, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: new Headers({
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: "SSWS " + _constants.Types.api_token
+    })
+  });
+  (0, _isomorphicUnfetch2.default)(request).then(function (res) {
+    var stateToken = res.stateToken;
+    console.log(res);
+    if (res.status === "SUCCESS") {
+      return res;
+    }
+  }).catch(function (err) {
+    return console.log(err);
+  });
+}
+
+/***/ }),
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1485,9 +1728,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getName = getName;
 
-var _userTypes = __webpack_require__(13);
+var _constants = __webpack_require__(7);
 
-var _axios = __webpack_require__(35);
+var _axios = __webpack_require__(39);
 
 var _axios2 = _interopRequireDefault(_axios);
 
@@ -1496,7 +1739,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function getName(user) {
     return async function (dispatch, getState) {
         // let {data} = await getUserFromAPI(id);
-        dispatch({ type: _userTypes.Types.UPDATE_NAME, payload: user });
+        dispatch({ type: _constants.Types.UPDATE_NAME, payload: user });
     };
 }
 // function getUserFromAPI(id) {
@@ -1508,7 +1751,7 @@ function getName(user) {
 // }
 
 /***/ }),
-/* 30 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1522,7 +1765,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 exports.default = loginReducer;
 
-var _loginTypes = __webpack_require__(12);
+var _constants = __webpack_require__(7);
 
 var initialState = {
     firstName: null,
@@ -1537,7 +1780,7 @@ function loginReducer() {
     var action = arguments[1];
 
     switch (action.type) {
-        case _loginTypes.Types.LOGIN_SUCCESS:
+        case _constants.Types.LOGIN_SUCCESS:
             return _extends({}, state, { login: action.profile._embedded.user.profile.login,
                 firstName: action.profile._embedded.user.profile.firstName,
                 lastName: action.profile._embedded.user.profile.lastName,
@@ -1549,7 +1792,7 @@ function loginReducer() {
 }
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1563,7 +1806,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 exports.default = userReducer;
 
-var _userTypes = __webpack_require__(13);
+var _constants = __webpack_require__(7);
 
 var initialState = {
     firstName: null,
@@ -1578,7 +1821,7 @@ function userReducer() {
     var action = arguments[1];
 
     switch (action.type) {
-        case _userTypes.Types.UPDATE_NAME:
+        case _constants.Types.UPDATE_NAME:
             return _extends({}, state, { name: action.payload.name, email: action.payload.email });
         default:
             return state;
@@ -1586,7 +1829,7 @@ function userReducer() {
 }
 
 /***/ }),
-/* 32 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1604,17 +1847,21 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _oktaAuthJs = __webpack_require__(6);
+var _oktaAuthJs = __webpack_require__(5);
 
 var _oktaAuthJs2 = _interopRequireDefault(_oktaAuthJs);
 
-var _oktaReact = __webpack_require__(2);
+var _oktaReact = __webpack_require__(1);
 
-var _redux = __webpack_require__(1);
+var _redux = __webpack_require__(2);
 
 var _reactRedux = __webpack_require__(3);
 
-var _loginAction = __webpack_require__(5);
+var _redirectWStatus = __webpack_require__(9);
+
+var _redirectWStatus2 = _interopRequireDefault(_redirectWStatus);
+
+var _loginAction = __webpack_require__(6);
 
 var actions = _interopRequireWildcard(_loginAction);
 
@@ -1646,12 +1893,16 @@ var RegisterForm = function (_React$Component) {
       lastName: "",
       email: "",
       password: "",
+      question: "",
+      answer: "",
       sessionToken: null
     };
     _this.handleSubmit = _this.handleSubmit.bind(_this);
     _this.handleFirstNameChange = _this.handleFirstNameChange.bind(_this);
     _this.handleLastNameChange = _this.handleLastNameChange.bind(_this);
     _this.handleEmailChange = _this.handleEmailChange.bind(_this);
+    _this.handleQuestionChange = _this.handleQuestionChange.bind(_this);
+    _this.handleAnswerChange = _this.handleAnswerChange.bind(_this);
     _this.handlePasswordChange = _this.handlePasswordChange.bind(_this);
     return _this;
   }
@@ -1667,6 +1918,18 @@ var RegisterForm = function (_React$Component) {
       this.setState({ lastName: e.target.value });
     }
   }, {
+    key: 'handleQuestionChange',
+    value: function handleQuestionChange(e) {
+      this.setState({ question: e.target.value });
+      // console.log(e.target.value)
+    }
+  }, {
+    key: 'handleAnswerChange',
+    value: function handleAnswerChange(e) {
+      this.setState({ answer: e.target.value });
+      // console.log(e.target.value);
+    }
+  }, {
     key: 'handleEmailChange',
     value: function handleEmailChange(e) {
       this.setState({ email: e.target.value });
@@ -1678,17 +1941,21 @@ var RegisterForm = function (_React$Component) {
     }
   }, {
     key: 'handleSubmit',
-    value: function handleSubmit(e) {
+    value: async function handleSubmit(e) {
       e.preventDefault();
       var _state = this.state,
           firstName = _state.firstName,
           lastName = _state.lastName,
           email = _state.email,
-          password = _state.password;
+          password = _state.password,
+          question = _state.question,
+          answer = _state.answer;
 
       var url = this.props.auth._config.baseUrl;
       if (email && password) {
-        this.props.register(firstName, lastName, email, password, url);
+        await this.props.register(firstName, lastName, email, password, url, question, answer);
+        // return <RedirectWithStatus key={Math.random() + "REDIRECT_"} from={"/regis"} to={"/login"} status={301} />;
+        alert('registration successful');
       }
     }
   }, {
@@ -1788,6 +2055,38 @@ var RegisterForm = function (_React$Component) {
                   '**Password must contain an Uppercase, a lowercase and a number. It should be up to 6 characters'
                 )
               ),
+              _react2.default.createElement(
+                'div',
+                { className: 'form-group' },
+                _react2.default.createElement(
+                  'label',
+                  { htmlFor: 'question' },
+                  'Security Question:'
+                ),
+                _react2.default.createElement('input', {
+                  className: 'form-control',
+                  type: 'text',
+                  id: 'question',
+                  value: this.state.question,
+                  onChange: this.handleQuestionChange
+                })
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'form-group' },
+                _react2.default.createElement(
+                  'label',
+                  { htmlFor: 'answer' },
+                  'Security Answer:'
+                ),
+                _react2.default.createElement('input', {
+                  className: 'form-control',
+                  type: 'text',
+                  id: 'answer',
+                  value: this.state.answer,
+                  onChange: this.handleAnswerChange
+                })
+              ),
               _react2.default.createElement('input', {
                 type: 'submit',
                 id: 'submit',
@@ -1807,7 +2106,10 @@ var RegisterForm = function (_React$Component) {
               { to: '/login' },
               _react2.default.createElement(
                 'button',
-                { type: 'button', className: 'btn btn-secondary btn-lg btn-block' },
+                {
+                  type: 'button',
+                  className: 'btn btn-secondary btn-lg btn-block'
+                },
                 'Login'
               )
             )
@@ -1831,7 +2133,7 @@ function mapDispatchToProps(dispatch) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _oktaReact.withAuth)(RegisterForm));
 
 /***/ }),
-/* 33 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1849,17 +2151,17 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _oktaAuthJs = __webpack_require__(6);
+var _oktaAuthJs = __webpack_require__(5);
 
 var _oktaAuthJs2 = _interopRequireDefault(_oktaAuthJs);
 
-var _oktaReact = __webpack_require__(2);
+var _oktaReact = __webpack_require__(1);
 
-var _redux = __webpack_require__(1);
+var _redux = __webpack_require__(2);
 
 var _reactRedux = __webpack_require__(3);
 
-var _loginAction = __webpack_require__(5);
+var _loginAction = __webpack_require__(6);
 
 var actions = _interopRequireWildcard(_loginAction);
 
@@ -1919,35 +2221,47 @@ var ResetPass = function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      if (this.state.sessionToken) {
-        this.props.auth.redirect({ sessionToken: this.state.sessionToken });
-        return null;
-      }
+      // if (this.state.sessionToken) {
+      //   this.props.auth.redirect({ sessionToken: this.state.sessionToken });
+      //   return null;
+      // }
 
       return _react2.default.createElement(
-        "form",
-        { onSubmit: this.handleSubmit },
+        "div",
+        { className: "container" },
         _react2.default.createElement(
           "div",
-          { className: "form-element" },
+          { className: "row" },
           _react2.default.createElement(
-            "label",
-            null,
-            "Password:"
-          ),
-          _react2.default.createElement("input", { type: "password", id: "password", value: this.state.password, onChange: this.handlePasswordChange })
-        ),
-        _react2.default.createElement(
-          "div",
-          { className: "form-element" },
-          _react2.default.createElement(
-            "label",
-            null,
-            "Confirm Password:"
-          ),
-          _react2.default.createElement("input", { type: "password", id: "password", value: this.state.confirm, onChange: this.handleConfirmChange })
-        ),
-        _react2.default.createElement("input", { type: "submit", id: "submit", value: "Register" })
+            "div",
+            { className: "col align-self-center" },
+            _react2.default.createElement(
+              "form",
+              { onSubmit: this.handleSubmit },
+              _react2.default.createElement(
+                "div",
+                { className: "form-element" },
+                _react2.default.createElement(
+                  "label",
+                  null,
+                  "Password:"
+                ),
+                _react2.default.createElement("input", { type: "password", id: "password", value: this.state.password, onChange: this.handlePasswordChange })
+              ),
+              _react2.default.createElement(
+                "div",
+                { className: "form-element" },
+                _react2.default.createElement(
+                  "label",
+                  null,
+                  "Confirm Password:"
+                ),
+                _react2.default.createElement("input", { type: "password", id: "password", value: this.state.confirm, onChange: this.handleConfirmChange })
+              ),
+              _react2.default.createElement("input", { type: "submit", id: "submit", value: "ResetPass" })
+            )
+          )
+        )
       );
     }
   }]);
@@ -1964,7 +2278,7 @@ function mapDispatchToProps(dispatch) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _oktaReact.withAuth)(ResetPass));
 
 /***/ }),
-/* 34 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1984,15 +2298,15 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRedux = __webpack_require__(3);
 
-var _redux = __webpack_require__(1);
+var _redux = __webpack_require__(2);
 
-var _reactHelmet = __webpack_require__(8);
+var _reactHelmet = __webpack_require__(11);
 
-var _userActions = __webpack_require__(29);
+var _userActions = __webpack_require__(32);
 
 var actions = _interopRequireWildcard(_userActions);
 
-var _oktaReact = __webpack_require__(2);
+var _oktaReact = __webpack_require__(1);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -2049,7 +2363,7 @@ var User = function (_Component) {
     value: function render() {
       var _this3 = this;
 
-      console.log(this.props);
+      // console.log(this.props)
       return _react2.default.createElement(
         'div',
         null,
@@ -2121,16 +2435,16 @@ function mapDispatchToProps(dispatch) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _oktaReact.withAuth)(User));
 
 /***/ }),
-/* 35 */
+/* 38 */
+/***/ (function(module, exports) {
+
+module.exports = require("@okta/okta-sdk-nodejs");
+
+/***/ }),
+/* 39 */
 /***/ (function(module, exports) {
 
 module.exports = require("axios");
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports) {
-
-module.exports = require("isomorphic-unfetch");
 
 /***/ })
 /******/ ]);

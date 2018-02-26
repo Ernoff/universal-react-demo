@@ -27,7 +27,7 @@ class User extends Component {
     this.getCurrentUser();
   }
     render() {
-        console.log(this.props)
+        // console.log(this.props)
         return <div>
             <Helmet>
               <meta charSet="utf-8" />

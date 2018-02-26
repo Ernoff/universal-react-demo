@@ -20,6 +20,7 @@ Sample ServerSide rendered demo using Redux and ReactJS for the frontend, Nodejs
 1.  Implement Recover password via Okta service
 2.  Reroute to secure routes after registration
 3.  Add javascript animation during background processes like login, registration and logout
+4. Refactor codes/folders
 
 ## Contributor
 [Ernest Offiong](http://github.com/ernoff)
